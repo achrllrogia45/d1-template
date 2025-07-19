@@ -4,14 +4,26 @@ type Log = {
   timestamp?: string;
   level?: string;
   message?: string;
+  [key: string]: any;
 };
 
+export function renderHtml(logs: Log[]): string {
   function formatTimestamp(ts: string | number | undefined): string {
     if (!ts) return '';
     if (typeof ts === 'number' || /^\d+$/.test(ts)) {
       return new Date(Number(ts)).toLocaleString();
     }
     return new Date(ts).toLocaleString();
+  }
+
+  // Escape HTML special characters to prevent XSS
+  function escapeHtml(str: string): string {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   return `
@@ -133,7 +145,7 @@ type Log = {
                       <button class="accordion-btn" onclick="toggleAccordion('log-${i}')">event body</button>
                     </div>
                     <div class="log-body" id="log-${i}">
-                      <pre>${json}</pre>
+                      <pre>${escapeHtml(json)}</pre>
                     </div>
                   </div>
                 `;

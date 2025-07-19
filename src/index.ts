@@ -1,11 +1,12 @@
+
 import { renderHtml } from "./renderHtml";
 
-export default {
   async fetch(request, env) {
-    const stmt = env.DB.prepare("SELECT * FROM comments LIMIT 3");
+    // Fetch logs from the logs table (assume fields: id, timestamp, level, message)
+    const stmt = env.DB.prepare("SELECT id, timestamp, level, message FROM logs ORDER BY timestamp DESC LIMIT 100");
     const { results } = await stmt.all();
 
-    return new Response(renderHtml(JSON.stringify(results, null, 2)), {
+    return new Response(renderHtml(results), {
       headers: {
         "content-type": "text/html",
       },
